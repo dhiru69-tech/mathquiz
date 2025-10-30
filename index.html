@@ -1,0 +1,171 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Probability Exam - 50 Min</title>
+<style>
+  body {
+    font-family: Arial, sans-serif;
+    background: #f5f7fa;
+    color: #222;
+    margin: 0;
+    padding: 0;
+  }
+  header {
+    background: #2c3e50;
+    color: white;
+    padding: 10px 20px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+  .timer {
+    font-size: 18px;
+    font-weight: bold;
+  }
+  main {
+    padding: 20px;
+    max-width: 800px;
+    margin: auto;
+  }
+  h2 {
+    background: #3498db;
+    color: white;
+    padding: 10px;
+    border-radius: 6px;
+  }
+  .question {
+    background: white;
+    border-radius: 8px;
+    padding: 15px;
+    margin: 15px 0;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+  }
+  .options label {
+    display: block;
+    margin: 5px 0;
+  }
+  button {
+    background: #27ae60;
+    color: white;
+    border: none;
+    padding: 10px 20px;
+    font-size: 16px;
+    border-radius: 5px;
+    cursor: pointer;
+  }
+  button:hover {
+    background: #219150;
+  }
+  #result {
+    text-align: center;
+    font-size: 20px;
+    font-weight: bold;
+    padding: 20px;
+    background: #ecf0f1;
+    border-radius: 8px;
+    display: none;
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <h1>📊 Probability Exam</h1>
+  <div class="timer" id="timer">Time Left: 50:00</div>
+</header>
+
+<main id="exam">
+  <h2>Set 1: Coin Toss Example</h2>
+</main>
+
+<div id="result"></div>
+
+<script>
+const questions = [
+  // --- Set 1: Coin Toss ---
+  {q:"1. What is P(B|A)?",a:["3/4","1/2","3/8","1"],correct:"3/4"},
+  {q:"2. What is P(A|Bc)?",a:["1/8","1/4","1/2","3/4"],correct:"1/4"},
+  {q:"3. What is P(Ac|B)?",a:["1/8","1/2","3/4","1/4"],correct:"1/4"},
+  {q:"4. If A∩B={HHH,HHT,HTT,HTH}, what is P(A|B)?",a:["3/4","1/2","1","3/8"],correct:"1"},
+  {q:"5. What is P(C|B)?",a:["1/2","1/4","3/4","1"],correct:"1/2"},
+
+  // --- Set 2: Radar Example ---
+  {q:"6. What is P(A∩B)?",a:["0.05","0.99","0.0495","0.005"],correct:"0.0495"},
+  {q:"7. What is P(Ac∩Bc)?",a:["0.90","0.855","0.95","0.10"],correct:"0.855"},
+  {q:"8. What is P(B)?",a:["1.09","0.99","0.10","0.1445"],correct:"0.1445"},
+  {q:"9. What is P(Bc)?",a:["0.8555","0.91","0.01","0.90"],correct:"0.8555"},
+  {q:"10. What is P(A|B)?",a:["≈0.3426","≈0.0495","≈0.6574","≈0.99"],correct:"≈0.3426"},
+  {q:"11. What is P(Ac|B)?",a:["≈0.10","≈0.095","≈0.3426","≈0.6574"],correct:"≈0.6574"},
+  {q:"12. What is P(A|Bc)?",a:["0.01","≈0.000584","≈0.0005","≈0.05"],correct:"≈0.000584"},
+  {q:"13. What does P(Bc|A) represent?",a:["false alarm","correct detection","miss","correct rejection"],correct:"miss"},
+  {q:"14. What is P(Ac∩B)+P(A∩Bc)?",a:["P(B)","P(Bc)","error","1"],correct:"error"},
+  {q:"15. Which is correct formula?",a:["P(A)×P(B)","P(Ac)×P(B|Ac)","P(B)×P(B|A)","P(B)×P(Ac|B)"],correct:"P(Ac)×P(B|Ac)"},
+
+  // --- Set 3: General Definitions ---
+  {q:"16. Find P(A3|A1∩A2).",a:["0.3","0.2","0.12","0.5"],correct:"0.3"},
+  {q:"17. Urn problem: three red balls?",a:["0.064","≈0.033","sum","0.088"],correct:"≈0.033"},
+  {q:"18. If P(A∩B)=0.3, P(A|B)=0.6, find P(B).",a:["0.18","0.5","2.0","0.3"],correct:"0.5"},
+  {q:"19. Which is NOT guaranteed true?",a:["Bayes","definition","P(A|B)=1−P(A|Bc)","P(A|B)=1−P(Ac|B)"],correct:"P(A|B)=1−P(A|Bc)"},
+  {q:"20. What is P(A∪B)?",a:["0.1445","0.0495","0.1945","0.1450"],correct:"0.1450"},
+];
+
+// render questions
+const examDiv = document.getElementById("exam");
+questions.forEach((q,i)=>{
+  const div=document.createElement("div");
+  div.className="question";
+  div.innerHTML=`<p><b>${q.q}</b></p>
+  <div class='options'>
+  ${q.a.map(opt=>`
+    <label><input type="radio" name="q${i}" value="${opt}"> ${opt}</label>
+  `).join("")}
+  </div>`;
+  examDiv.appendChild(div);
+});
+
+// Timer logic (50 min = 3000s)
+let timeLeft = 3000;
+const timerEl = document.getElementById("timer");
+function updateTimer(){
+  const m=Math.floor(timeLeft/60);
+  const s=timeLeft%60;
+  timerEl.textContent=`Time Left: ${String(m).padStart(2,'0')}:${String(s).padStart(2,'0')}`;
+  if(timeLeft<=0){
+    clearInterval(timer);
+    submitExam();
+  }
+  timeLeft--;
+}
+const timer=setInterval(updateTimer,1000);
+
+// Fullscreen on start
+document.body.addEventListener("click",()=>{ 
+  if (!document.fullscreenElement) document.documentElement.requestFullscreen();
+},{once:true});
+
+// Submit logic
+function submitExam(){
+  clearInterval(timer);
+  let score=0;
+  questions.forEach((q,i)=>{
+    const sel=document.querySelector(`input[name="q${i}"]:checked`);
+    if(sel && sel.value===q.correct) score++;
+  });
+  const total=questions.length;
+  const percent=((score/total)*100).toFixed(2);
+  document.getElementById("exam").style.display="none";
+  document.getElementById("result").style.display="block";
+  document.getElementById("result").innerHTML=`
+    ✅ <h2>Exam Submitted!</h2>
+    <p>Your Score: ${score}/${total} (${percent}%)</p>
+    <p>📝 Note: Review incorrect answers for understanding before next attempt.</p>
+  `;
+}
+
+// Auto-submit when tab closed or page hidden
+window.addEventListener("beforeunload",submitExam);
+</script>
+</body>
+</html>
