@@ -50,7 +50,7 @@
     background: #27ae60;
     color: white;
     border: none;
-    padding: 10px 20px;
+    padding: 12px 24px;
     font-size: 16px;
     border-radius: 5px;
     cursor: pointer;
@@ -66,6 +66,10 @@
     background: #ecf0f1;
     border-radius: 8px;
     display: none;
+  }
+  #submitBtn {
+    display: block;
+    margin: 30px auto;
   }
 </style>
 </head>
@@ -125,6 +129,13 @@ questions.forEach((q,i)=>{
   examDiv.appendChild(div);
 });
 
+// Add Submit Button
+const submitBtn = document.createElement("button");
+submitBtn.id = "submitBtn";
+submitBtn.textContent = "Submit Exam";
+submitBtn.onclick = submitExam;
+examDiv.appendChild(submitBtn);
+
 // Timer logic (50 min = 3000s)
 let timeLeft = 3000;
 const timerEl = document.getElementById("timer");
@@ -140,12 +151,12 @@ function updateTimer(){
 }
 const timer=setInterval(updateTimer,1000);
 
-// Fullscreen on start
+// Fullscreen on first click
 document.body.addEventListener("click",()=>{ 
   if (!document.fullscreenElement) document.documentElement.requestFullscreen();
 },{once:true});
 
-// Submit logic
+// Submit Exam Function
 function submitExam(){
   clearInterval(timer);
   let score=0;
@@ -156,16 +167,16 @@ function submitExam(){
   const total=questions.length;
   const percent=((score/total)*100).toFixed(2);
   document.getElementById("exam").style.display="none";
-  document.getElementById("result").style.display="block";
-  document.getElementById("result").innerHTML=`
+  const resultDiv=document.getElementById("result");
+  resultDiv.style.display="block";
+  resultDiv.innerHTML=`
     ✅ <h2>Exam Submitted!</h2>
     <p>Your Score: ${score}/${total} (${percent}%)</p>
-    <p>📝 Note: Review incorrect answers for understanding before next attempt.</p>
+    <p>📝 Note: Review incorrect answers before next attempt.</p>
   `;
 }
-
-// Auto-submit when tab closed or page hidden
-window.addEventListener("beforeunload",submitExam);
 </script>
 </body>
 </html>
+
+
